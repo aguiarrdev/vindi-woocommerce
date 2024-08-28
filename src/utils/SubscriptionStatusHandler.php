@@ -8,7 +8,7 @@ class VindiSubscriptionStatusHandler
      * @var VindiSettings
      */
     private $vindi_settings;
-    
+
     /**
      * @var VindiRoutes
      */
@@ -22,6 +22,11 @@ class VindiSubscriptionStatusHandler
         add_action('woocommerce_subscription_status_cancelled', array(
             &$this, 'cancelled_status',
         ));
+
+		add_action('woocommerce_subscription_status_cancelled', array(
+            &$this, 'cancelled_status',
+        ));
+
 
         add_action('woocommerce_subscription_status_updated', array(
             &$this, 'filter_pre_status',
@@ -54,9 +59,7 @@ class VindiSubscriptionStatusHandler
                 $this->cancelled_status($wc_subscription);
                 break;
             case 'pending-cancel':
-                if (!$this->vindi_settings->dependencies->is_wc_memberships_active()) {
-                    $wc_subscription->update_status('cancelled');
-                }
+                $this->cancelled_status($wc_subscription);
                 break;
         }
     }
@@ -167,7 +170,7 @@ class VindiSubscriptionStatusHandler
                 $vindi_order[$key]['bill']['status'] = 'canceled';
             }
         }
-        
+
         $order->update_meta_data('vindi_order', $vindi_order);
         $order->save();
 
